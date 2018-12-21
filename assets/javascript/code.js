@@ -65,21 +65,18 @@ $(document).ready(function () {
     // When the client's connection state changes...
     // connectedRef.on("value", function (snap) {
 
-    // If they are connected..
-    if (snap.val()) {
+    connectedRef.on("value", function (snap) {
 
-        // Add user to the connections list.
-        var con = connectionsRef.push(true);
+        // If they are connected..
+        if (snap.val()) {
 
-        // Remove user from the connection list when they disconnect.
-        con.onDisconnect().remove((doThis) => {
-            if (doThis) {
-                player2.set({
-                    "name": "abc"
-                });
-            }
-        });
-    }
+            // Add user to the connections list.
+            var con = connectionsRef.push(true);
+
+            // Remove user from the connection list when they disconnect.
+            con.onDisconnect().remove();
+        }
+    });
 
     connectionsRef.on('value', function (snap) {
 
