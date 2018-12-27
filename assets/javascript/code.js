@@ -13,6 +13,7 @@ var players = 0; // How many players (only 0, 1 and 2 are possible!)
 
 //      BOOLEAN
 var playerMode = false; // Current connection is playing?
+var choiceDone = false;
 
 //      OBJECTS
 
@@ -72,6 +73,11 @@ $(document).ready(function () {
     }
 
     $(".choice").on("click", function () {
+        if(choiceDone){
+            return;
+        }
+        $(".choice").addClass("disabled");
+        choiceDone = true;
         player.choice = this.id;
 
         console.log(player.choice);
@@ -79,6 +85,8 @@ $(document).ready(function () {
         connectionsRef.child(userId).update({
             "choice": player.choice
         });
+
+        $("#selection").html("<h1>" + player.choice + "</h1>");
 
     })
 
