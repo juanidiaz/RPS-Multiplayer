@@ -1,47 +1,42 @@
 // VARIABLES --------------------------------------------
 
 //      CONSTANTS
-const playButton = $("#play-bid");
 
 //      ARRAYS
 
-
 //      STRINGS/CHAR
-var pName = ''; // Current player's name
-var pChoice = ''; // Current player's choice
-var otherName = ''; // Oponent's name
-var otherChoice = ''; // Oponent's choice
+var userId = ''; // User UD when connecting to database
 
 //      NUMBER/INTEGER
 var viewers = 0; // How many connections
 var players = 0; // How many players (only 0, 1 and 2 are possible!)
 
 //      BOOLEAN
-var player = false; // Current conenction is playing?
+var playerMode = false; // Current connection is playing?
 
 //      OBJECTS
-var player = {
-    pName,
-    pChoice
-};
-var oponent = {
-    otherName,
-    otherChoice
-};
+
+// Creating a "player info" object using constructor notation
+function playerInfo(playerName, playerChoice) {
+    this.name = playerName; // Player's name
+    this.choice = playerChoice; // Player's choice
+}
+
+var player = new playerInfo('', ''); // Contains CURRENT player info
+var oponent = new playerInfo('', ''); // Contains OPONENT payer info
 
 // ------------------------------------------------------------
 
 
 $(document).ready(function () {
 
-    // Initialize Firebase
     var config = {
-        apiKey: "AIzaSyB1HxxxgWtZVB6TQ4nR4jsDL8cLdLs1e5k",
-        authDomain: "bootcamp-b291e.firebaseapp.com",
-        databaseURL: "https://bootcamp-b291e.firebaseio.com",
-        projectId: "bootcamp-b291e",
-        storageBucket: "bootcamp-b291e.appspot.com",
-        messagingSenderId: "170857954110"
+        apiKey: "AIzaSyAR1BzexHwtNHQ1VZOFjqsTVipSyWvfBnc",
+        authDomain: "codingbootcamp-dc35e.firebaseapp.com",
+        databaseURL: "https://codingbootcamp-dc35e.firebaseio.com",
+        projectId: "codingbootcamp-dc35e",
+        storageBucket: "",
+        messagingSenderId: "765982769333"
     };
 
     firebase.initializeApp(config);
@@ -50,20 +45,42 @@ $(document).ready(function () {
     var database = firebase.database();
 
     var gameStats = database.ref("/rpm_multiuser/gameStats");
-    var players = database.ref("/rpm_multiuser/player");
-    var player1 = database.ref("/rpm_multiuser/player/p1");
-    var player2 = database.ref("/rpm_multiuser/player/p2");
 
     // All connections will be stored in this directory.
     var connectionsRef = database.ref("/rpm_multiuser/connections");
 
-    // '.info/connected' is a special location provided by Firebase that is updated
-    // every time the client's connection state changes.
-    // '.info/connected' is a boolean value, true if the client is connected and false if they are not.
     var connectedRef = database.ref(".info/connected");
 
-    // When the client's connection state changes...
-    // connectedRef.on("value", function (snap) {
+    function updateScreen() {
+
+        if (playerMode) {
+            $("#user").hide();
+            $("#game").show();
+            $("#viewerStat").hide();
+        } else if(players < 2) {
+            $("#user").show();
+            $("#game").hide();
+            $("#viewerStat").hide();
+        }else{
+            $("#user").hide();
+            $("#game").hide();
+            $("#viewerStat").show();
+        }
+
+        $("#connected-viewers").text(viewers);
+        $("#connected-players").text(players);
+    }
+
+    $(".choice").on("click", function () {
+        player.choice = this.id;
+
+        console.log(player.choice);
+
+        connectionsRef.child(userId).update({
+            "choice": player.choice
+        });
+
+    })
 
     connectedRef.on("value", function (snap) {
 
@@ -72,6 +89,13 @@ $(document).ready(function () {
 
             // Add user to the connections list.
             var con = connectionsRef.push(true);
+            userId = con.getKey();
+
+            console.log('Connected as: ' + userId);
+
+            connectionsRef.child(userId).set({
+                "mode": "viewer"
+            });
 
             // Remove user from the connection list when they disconnect.
             con.onDisconnect().remove();
@@ -83,88 +107,44 @@ $(document).ready(function () {
         viewers = parseInt(snap.numChildren());
 
         // Someone has connected!
-        console.log("Viewers: " + viewers);
+        //console.log("Viewers: " + viewers);
 
         // Update the number of viewers in the database
         gameStats.update({
             "viewers": viewers
         });
 
-        $("#connected-viewers").text(viewers);
+        updateScreen();
     })
 
-    players.on('value', function (snap) {
+    gameStats.on('value', function (snap) {
 
-        if (snap.exists()) {
-            players = snap.numChildren();
-            console.log('Ther is at least one player');
-            playButton.hide();
+        // Update the number of players in the browser
+        players = snap.val().players;
 
-        } else {
-            players = 0;
-            console.log('There are NO players');
-            // console.log(gameStats.doc());
-            playButton.show();
-
-        }
-        // Player 1 has been updated!
-
-        $("#connected-players").text(players);
-
+        updateScreen();
     })
 
-    player1.on('value', function (snap) {
-
-        if (snap.exists()) {
-            console.log('P1 Name: ' + snap.val().name);
-            console.log('P1 Choice: ' + snap.val().choice);
-        }
-        // Player 1 has been updated!
-
-    })
-
-    player2.on('value', function (snap) {
-
-        if (snap.exists()) {
-            console.log('P2 Name: ' + snap.val().name);
-            console.log('P2 Choice: ' + snap.val().choice);
-        }
-        // Player 2 has been updated!
-
-    })
-
-    playButton.on("click", function (event) {
+    $("#play-bid").on("click", function (event) {
         event.preventDefault();
 
-        pName = $("@player-name").val().trim();
-
-        console.log('lets play!');
-
-        player = true;
-        switch (players) {
-            case 0:
-                console.log('You are player 1');
-
-                // set the player 1 info
-                player1.update({
-                    "name": pName
-                });
-
-                break;
-
-            case 1:
-                console.log('You are player 2');
-
-                // set the player 1 info
-                player2.update({
-                    "name": pName
-                });
-
-                break;
-
-            default:
-                break;
+        // Escaping if no name was given
+        if (!$("#player-name").val().trim()) {
+            alert('Please enter a valid name and clik PLAY');
+            return;
         }
+
+        player.name = $("#player-name").val().trim();
+        $("#player-name").val("");
+
+        console.log('Lets play ' + player.name);
+
+        playerMode = true;
+
+        connectionsRef.child(userId).update({
+            "mode": "player",
+            "name": player.name
+        });
 
         // Increase the number of players
         players++;
@@ -174,8 +154,27 @@ $(document).ready(function () {
             "players": players
         });
 
-
-
     });
+
+    $("#quit").on("click", function () {
+        // Increase the number of players
+        players--;
+
+        playerMode = false;
+
+        // Update the number of players in the database
+        gameStats.update({
+            "players": players
+        });
+
+        connectionsRef.child(userId).set({
+            "mode": "viewer"
+        });
+
+    })
+
+
+
+
 
 });

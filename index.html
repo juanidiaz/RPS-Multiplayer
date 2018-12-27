@@ -35,9 +35,9 @@
 
         <div class="container">
 
-            <section id="stats" class="row">
+            <section class="row" id="stats">
                 <div class="col-lg-12">
-                    <h3 class="">There are
+                    <h3>There are
                         <strong><span id="connected-viewers">X</span>
                         </strong> LIVE conenctions.</h3>
                 </div>
@@ -48,19 +48,29 @@
                 </div>
             </section>
 
-            <section id="user" class="row">
-                <label for="bidder-name">Your Name</label>
-                <input class="form-control" id="player-name" type="text">
-                <button type="button" id="play-bid" class="btn btn-primary">PLAY</button>
-
+            <section class="row" id="user">
+                <form>
+                    <label for="bidder-name">Your Name</label>
+                    <input class="form-control" id="player-name" type="text" name="userName" required>
+                    <button type="button" id="play-bid" class="btn btn-primary">PLAY</button>
+                </form>
             </section>
 
-            <section id="game" class="row">
-
-
+            <section class="row" id="game">
+                <div>
+                    <button type="button" id="quit" class="btn btn-primary">STOP PLAYING</button>
+                </div>
+                <p>Choose your weapon</p>
+                <div>
+                    <button type="button" id="rock" class="btn btn-primary choice">ROCK</button>
+                    <button type="button" id="paper" class="btn btn-primary choice">PAPER</button>
+                    <button type="button" id="scissors" class="btn btn-primary choice">SCISSORS</button>
+                </div>
             </section>
 
-
+            <section id="viewerStat">
+                <h3>Here you will see the status of the game</h3>
+            </section>
 
         </div>
 
