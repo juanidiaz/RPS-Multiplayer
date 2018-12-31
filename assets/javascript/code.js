@@ -350,9 +350,16 @@ $(document).ready(function () {
         updateScreen();
     })
 
+    $("#buttonView").on("click", function (e) {
+        e.preventDefault();
+
+        console.log("VIEW")
+    })
+
+
     // The viewer clicks to PLAY... turning it into PLAYER
-    $("#play").on("click", function (event) {
-        event.preventDefault();
+    $("#buttonPlay").on("click", function (e) {
+        e.preventDefault();
 
         // Escaping if no name was given
         if (!$("#player-name").val().trim()) {
@@ -384,8 +391,8 @@ $(document).ready(function () {
     });
 
     // The PLAYER wants to play a subsecuent game
-    $("#selection").on("click", "#playAgain", function (event) {
-        event.preventDefault();
+    $("#selection").on("click", "#playAgain", function (e) {
+        e.preventDefault();
 
         console.log("REPLAY!!")
 
