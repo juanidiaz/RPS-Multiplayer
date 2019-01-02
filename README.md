@@ -28,5 +28,6 @@ This project is an online multiplayer game version of the known rock-paper-sciss
 
 
 ## QUESTIONS OR COMMENTS
+- Logo taken from [http://www.redbits.com/iphone/rps/](http://www.redbits.com/iphone/rps/).
 - Feel free to contact the developer @ <jdi@idiaz.ca>!
 - See the project [live](https://juanidiaz.github.io/RPS-Multiplayer/).

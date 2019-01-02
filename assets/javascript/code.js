@@ -19,7 +19,9 @@ var players = 0; // How many players (only 0, 1 and 2 are possible!)
 
 //      BOOLEAN
 var playerMode = false; // Current connection is playing?
+var viewerMode = true; // User is VIEWER only... not playing
 var choiceDone = false;
+var firstTime = true; // True if the first time the page is loaded
 
 //      OBJECTS
 
@@ -57,6 +59,111 @@ $(document).ready(function () {
 
     // ----------------------------------------------
 
+    // Re-draw screen based on game variables
+    function updateScreen() {
+
+        // The user is PLAYING
+        if (playerMode) {
+            // This shows for players only
+            $("#welcomeSection").hide();
+            $("#userSection").hide();
+            $("#statsSection").hide();
+            $("#viewerSection").hide();
+            $("#playerSection").show();
+            $("#buttonAgain").hide();
+
+            $("#playerMain").text("You're playing as " + player.name)
+
+            // Print choice on browser
+            if (player.choice) {
+                $("#playerSub").fadeTo(0, 0);
+                $("#buttonQuit").hide();
+                $("#selection").html("<h1> You have selected " + player.choice.toUpperCase());
+                $("#selection").fadeTo("slow", 1);
+
+            } else {
+                $("#buttonQuit").show();
+                $("#buttonAgain").hide();
+            }
+
+            if (player.choice && oponent.choice) {
+
+                console.log("Who wins: " + whoWin(player.choice, oponent.choice));
+
+                switch (whoWin(player.choice, oponent.choice)) {
+                    case "p1name":
+                        console.log("you win!");
+                        $("#selection").append("<h1>" + oponent.name + " chose " + oponent.choice + "... You win!<h1>");
+                        break;
+
+                    case "p2name":
+                        console.log("you lose!");
+                        $("#selection").append("<h1>" + oponent.name + " chose " + oponent.choice + "... You lost!<h1>");
+                        break;
+
+                    default:
+                        console.log("TIE");
+                        $("#selection").append("Same choices... it's a tie!")
+                        break;
+                }
+
+                setTimeout(() => {
+                    $("#buttonQuit").fadeTo("slow", 1);
+                    $("#buttonAgain").fadeTo("slow", 1);
+                    choiceDone = false;
+                    player.choice = '';
+                    oponent.choice = '';
+                }, 3000);
+            };
+
+        }
+
+        // User is VIEWING only
+        if (viewerMode) {
+
+            // This happens if the user hasn't select either VIEW nor PLAY
+            if (firstTime) {
+                $("#welcomeSection").show();
+
+                if (players < 2) {
+                    $("#userSection").show();
+
+                } else {
+                    $("#welcomeSection").hide();
+                    $("#userSection").hide();
+                }
+
+            } else {
+                $("#welcomeSection").hide();
+                $("#userSection").hide();
+            }
+
+            $("#statsSection").show();
+            $("#viewerSection").show();
+            $("#playerSection").hide();
+
+
+            $("#viewerStuff").html("<h3>" + p1name + " VS " + p2name + "</h3>");
+
+            if (p1choice) {
+                $("#viewerStuff").append(p1name + " chice: " + p1choice + "<br>")
+            };
+            if (p2choice) {
+                $("#viewerStuff").append(p2name + " chice: " + p2choice + "<br>")
+            };
+
+            if (p1choice && p2choice) {
+                $("#viewerStuff").append(eval(whoWin(p1choice, p2choice)) + " WINS")
+            };
+
+
+        }
+
+        $("#connected-viewers").text(viewers);
+        $("#connected-players").text(players);
+
+    }
+
     // Look for viewers in 'player' mode
     function checkFor(mode) {
 
@@ -85,7 +192,7 @@ $(document).ready(function () {
                     break;
             }
 
-            // Get the id, name anc choice of players and save localy
+            // Get the id, name and choice of players, then save localy
             var i = 1;
             snapshot.forEach(function (data) {
                 switch (i) {
@@ -152,109 +259,6 @@ $(document).ready(function () {
         });
 
     }
-
-
-    // ----------------------------------------------
-
-    function updateScreen() {
-
-        if (playerMode) {
-            // This shows for players only
-            $("#userSection").hide();
-            $("#gameSection").show();
-            $("#viewerSection").hide();
-
-            // Print choice on browser
-            $("#selection").html("<br><h1>" + player.choice + "</h1><br>");
-
-            if (player.choice && oponent.choice) {
-
-                console.log("Who wins: " + whoWin(player.choice, oponent.choice));
-
-                switch (whoWin(player.choice, oponent.choice)) {
-                    case "p1name":
-                        console.log("you win!");
-                        $("#selection").append("You win")
-                        break;
-
-                    case "p2name":
-                        console.log("you lose!");
-                        $("#selection").append("You lose")
-                        break;
-
-                    default:
-                        console.log("TIE");
-                        $("#selection").append("Tie!")
-                        break;
-                }
-
-                setTimeout(() => {
-                    $('#selection').append('<button type="button" id="playAgain" class="btn btn-primary">PLAY AGAIN</button>')
-                    choiceDone = false;
-                    player.choice = '';
-                }, 3000);
-            };
-
-        } else if (players < 2) {
-            // This shows for viewers when there is at least on spot to play
-            $("#userSection").show();
-            $("#gameSection").hide();
-            $("#viewerSection").hide();
-
-
-        } else {
-            // This shows for viewers only
-            $("#userSection").hide();
-            $("#gameSection").hide();
-            $("#viewerSection").show();
-
-            $("#viewerSection").html("<h3>" + p1name + " VS " + p2name + "</h3>");
-
-            if (p1choice) {
-                $("#viewerSection").append(p1name + " chice: " + p1choice + "<br>")
-            };
-            if (p2choice) {
-                $("#viewerSection").append(p2name + " chice: " + p2choice + "<br>")
-            };
-
-            if (p1choice && p2choice) {
-                $("#viewerSection").append(eval(whoWin(p1choice, p2choice)) + " WINS")
-            };
-        }
-
-        $("#connected-viewers").text(viewers);
-        $("#connected-players").text(players);
-
-    }
-
-    // The player makes a choice
-    $(".choice").on("click", function () {
-
-        // No backsies! Only can choice once 
-        if (choiceDone) {
-            return;
-        }
-
-        // Hide option buttons
-        $(".choice").hide();
-
-        // Choise made... can't change it
-        choiceDone = true;
-
-        // Save the player's choice
-        player.choice = this.id;
-
-        // Log player's choice
-        //console.log(player.choice);
-
-        // Update the player choice to the connection tree
-        connectionsRef.child(userId).update({
-            "choice": player.choice
-        });
-
-        // Re-draw screen
-        updateScreen();
-    })
 
     //When a connection is made this is run
     connectedRef.on("value", function (snap) {
@@ -350,16 +354,64 @@ $(document).ready(function () {
         updateScreen();
     })
 
+    // ********************************
+    // **      BUTTON logic
+    // ********************************
+
+    // The player makes a choice
+    $(".choice").on("click", function () {
+
+        // No backsies! Only can choice once 
+        if (choiceDone) {
+            return;
+        }
+
+        // Choice made... can't change it
+        choiceDone = true;
+
+        // Save the player's choice
+        player.choice = this.id;
+
+        // Fade option buttons
+        $(".choice").fadeTo(0, 0.5, function () {
+            document.getElementById(player.choice).style.opacity = "1";
+        });
+
+        // setTimeout(() => {
+        // }, 60);
+
+
+        // Log player's choice
+        //console.log(player.choice);
+
+        // Update the player choice to the connection tree
+        connectionsRef.child(userId).update({
+            "choice": player.choice
+        });
+
+        // Re-draw screen
+        updateScreen();
+    })
+
+    // The user clicks to VIEW... not playing!
     $("#buttonView").on("click", function (e) {
         e.preventDefault();
 
-        console.log("VIEW")
+        firstTime = false;
+        playerMode = false;
+        viewerMode = true;
+
+        // Re-draw screen
+        updateScreen();
     })
 
-
-    // The viewer clicks to PLAY... turning it into PLAYER
+    // The user clicks to PLAY... turning it into PLAYER
     $("#buttonPlay").on("click", function (e) {
         e.preventDefault();
+
+        firstTime = false;
+        playerMode = true;
+        viewerMode = false;
 
         // Escaping if no name was given
         if (!$("#player-name").val().trim()) {
@@ -391,7 +443,7 @@ $(document).ready(function () {
     });
 
     // The PLAYER wants to play a subsecuent game
-    $("#selection").on("click", "#playAgain", function (e) {
+    $("#buttonAgain").on("click", function (e) {
         e.preventDefault();
 
         console.log("REPLAY!!")
@@ -400,23 +452,31 @@ $(document).ready(function () {
         choiceDone = false;
 
         // Show option buttons
-        $(".choice").show();
+        $(".choice").fadeTo(0, 1);
+        $("#playerSub").fadeTo(0, 1);
+
+        $("#selection").empty();
+
+        player.choice = "";
+        oponent.choice = "";
+
+        connectionsRef.child(userId).update({
+            "choice": ""
+        });
 
         // Re-draw screen
         updateScreen();
     })
 
-    // PLayer decides to stop playing
-    $("#quit").on("click", function () {
+    // Player decides to stop playing
+    $("#buttonQuit").on("click", function () {
 
         // Increase the number of players
         players--;
 
         // Out of game mode
         playerMode = false;
-
-        // Show option buttons
-        $(".choice").show();
+        viewerMode = true;
 
         // Update the number of players in the database
         gameStats.update({
@@ -430,7 +490,10 @@ $(document).ready(function () {
 
     })
 
-
+    // Toggles instructions visibility
+    $("#showInstructions").on("click", function () {
+        $("#instructions").fadeToggle();
+    })
 
 
 
