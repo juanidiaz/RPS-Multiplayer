@@ -1,40 +1,45 @@
 // VARIABLES --------------------------------------------
 
 //      CONSTANTS
-const playButton = $("#play-bid");
 
 //      ARRAYS
 
-
 //      STRINGS/CHAR
-var pName = ''; // Current player's name
-var pChoice = ''; // Current player's choice
-var otherName = ''; // Oponent's name
-var otherChoice = ''; // Oponent's choice
+var userId = ''; // User UD when connecting to database
+var p1name = '';
+var p1choice = '';
+var p1id = '';
+var p2name = '';
+var p2choice = '';
+var p2id = '';
 
 //      NUMBER/INTEGER
 var viewers = 0; // How many connections
 var players = 0; // How many players (only 0, 1 and 2 are possible!)
+var games = 0;
+var wins = 0;
+var loses = 0;
 
 //      BOOLEAN
-var player = false; // Current conenction is playing?
+var playerMode = false; // Current connection is playing?
+var viewerMode = false; // User is VIEWER only... not playing
+var choiceDone = false;
 
 //      OBJECTS
-var player = {
-    pName,
-    pChoice
-};
-var oponent = {
-    otherName,
-    otherChoice
-};
+
+// Creating a "player info" object using constructor notation
+function playerInfo(playerName, playerChoice) {
+    this.name = playerName; // Player's name
+    this.choice = playerChoice; // Player's choice
+}
+
+var player = new playerInfo('', ''); // Contains CURRENT player info
+var oponent = new playerInfo('', ''); // Contains OPONENT payer info
 
 // ------------------------------------------------------------
 
-
 $(document).ready(function () {
 
-    // Initialize Firebase
     var config = {
         apiKey: "AIzaSyAR1BzexHwtNHQ1VZOFjqsTVipSyWvfBnc",
         authDomain: "codingbootcamp-dc35e.firebaseapp.com",
@@ -44,27 +49,220 @@ $(document).ready(function () {
         messagingSenderId: "765982769333"
     };
 
+    // Initialize FirebaseDatabase
     firebase.initializeApp(config);
 
-    // Create a variable to reference the database.
+    // Create references to the database
     var database = firebase.database();
-
     var gameStats = database.ref("/rpm_multiuser/gameStats");
-    var players = database.ref("/rpm_multiuser/player");
-    var player1 = database.ref("/rpm_multiuser/player/p1");
-    var player2 = database.ref("/rpm_multiuser/player/p2");
-
-    // All connections will be stored in this directory.
+    var playerInfo = database.ref("/rpm_multiuser/playerInfo");
     var connectionsRef = database.ref("/rpm_multiuser/connections");
-
-    // '.info/connected' is a special location provided by Firebase that is updated
-    // every time the client's connection state changes.
-    // '.info/connected' is a boolean value, true if the client is connected and false if they are not.
     var connectedRef = database.ref(".info/connected");
 
-    // When the client's connection state changes...
-    // connectedRef.on("value", function (snap) {
+    // ----------------------------------------------
 
+    // Re-draw screen based on game variables
+    function updateScreen() {
+
+        // This shows the first time
+        if (!playerMode && !viewerMode) {
+
+            // Display only the welcome and vie/play button section
+            $("#welcomeSection").show();
+            $("#userSection").show();
+            $("#statsSection").hide();
+            $("#viewerSection").hide();
+            $("#playerSection").hide();
+            $("#buttonAgain").hide();
+        }
+
+        // The user is PLAYING
+        if (playerMode) {
+
+            // For players only. display the player section
+            $("#welcomeSection").hide();
+            $("#userSection").hide();
+            $("#statsSection").hide();
+            $("#viewerSection").hide();
+            $("#playerSection").show();
+            $("#buttonAgain").hide();
+
+            $("#playerMain").text("Your player name is: " + player.name);
+            $("#playerScore").text("GAMES: " + games + " - WINS: " + wins + " - LOSES: " + loses);
+
+            // Print choice on browser
+            if (player.choice) {
+                $("#playerSub").fadeTo(0, 0);
+                $("#buttonQuit").hide();
+                $("#selection").html("<h1> You have selected " + player.choice.toUpperCase());
+                $("#selection").fadeTo("slow", 1);
+
+            } else {
+                $("#buttonQuit").show();
+                $("#buttonAgain").hide();
+            }
+
+            if (player.choice && oponent.choice) {
+
+                console.log("Who wins: " + whoWin(player.choice, oponent.choice));
+
+                switch (whoWin(player.choice, oponent.choice)) {
+                    case "p1name":
+                        win++;
+                        console.log("you win!");
+                        $("#selection").append("<h1>" + oponent.name + " chose " + oponent.choice + "... You win!<h1>");
+                        break;
+
+                    case "p2name":
+                        loses++;
+                        console.log("you lose!");
+                        $("#selection").append("<h1>" + oponent.name + " chose " + oponent.choice + "... You lost!<h1>");
+                        break;
+
+                    default:
+                        console.log("TIE");
+                        $("#selection").append("Same choices... it's a tie!")
+                        break;
+                }
+
+                setTimeout(() => {
+                    $("#buttonQuit").fadeTo("slow", 1);
+                    $("#buttonAgain").fadeTo("slow", 1);
+                    choiceDone = false;
+                    player.choice = '';
+                    oponent.choice = '';
+                }, 3000);
+            };
+
+        }
+
+        // User is VIEWING only
+        if (viewerMode) {
+
+            $("#welcomeSection").hide();
+            $("#userSection").hide();
+            $("#statsSection").show();
+            $("#viewerSection").show();
+            $("#playerSection").hide();
+
+            $("#viewerStuff").html("<h3>" + p1name + " VS " + p2name + "</h3>");
+
+            if (p1choice) {
+                $("#viewerStuff").append(p1name + " chice: " + p1choice + "<br>")
+            };
+            if (p2choice) {
+                $("#viewerStuff").append(p2name + " chice: " + p2choice + "<br>")
+            };
+
+            if (p1choice && p2choice) {
+                $("#viewerStuff").append(eval(whoWin(p1choice, p2choice)) + " WINS")
+            };
+
+
+        }
+
+        $("#connected-viewers").text(viewers);
+        $("#connected-players").text(players);
+
+    }
+
+    // Look for viewers in 'player' mode
+    function checkFor(mode) {
+
+        let modeRef = firebase.database().ref('/rpm_multiuser');
+
+        modeRef.child('connections').orderByChild('mode').equalTo(mode).on("value", function (snapshot) {
+
+            // Number of players are as many connections in 'player' mode
+            players = parseInt(snapshot.numChildren());
+
+            // Clear the variables based on # of players
+            switch (players) {
+                case 0:
+                    p1name = '';
+                    p1choice = '';
+                    p1id = '';
+                    p2name = '';
+                    p2choice = '';
+                    p2id = '';
+                    break;
+
+                case 1:
+                    p2name = '';
+                    p2choice = '';
+                    p2id = '';
+                    break;
+            }
+
+            // Get the id, name and choice of players, then save localy
+            var i = 1;
+            snapshot.forEach(function (data) {
+                switch (i) {
+                    case 1:
+                        if (data.val().name) {
+                            p1name = data.val().name;
+                        } else {
+                            p1name = ''
+                        };
+                        if (data.val().choice) {
+                            p1choice = data.val().choice;
+                        } else {
+                            p1choice = ''
+                        };
+                        if (data.key) {
+                            p1id = data.key;
+                        } else {
+                            p1id = ''
+                        };
+                        break;
+
+                    case 2:
+                        if (data.val().name) {
+                            p2name = data.val().name;
+                        } else {
+                            p2name = ''
+                        };
+                        if (data.val().choice) {
+                            p2choice = data.val().choice;
+                        } else {
+                            p2choice = ''
+                        };
+                        if (data.key) {
+                            p2id = data.key;
+                        } else {
+                            p2id = ''
+                        };
+                        break;
+                }
+
+                if (data.key !== userId) {
+                    oponent.name = data.val().name;
+                    oponent.choice = data.val().choice;
+                }
+
+                i++;
+            });
+
+            // Update the number of players in the database
+            gameStats.update({
+                "players": players
+            });
+
+            // Now update these values in the database
+            playerInfo.update({
+                "p1name": p1name,
+                "p1choice": p1choice,
+                "p1id": p1id,
+                "p2name": p2name,
+                "p2choice": p2choice,
+                "p2id": p2id
+            });
+
+        });
+
+    }
+
+    //When a connection is made this is run
     connectedRef.on("value", function (snap) {
 
         // If they are connected..
@@ -73,109 +271,233 @@ $(document).ready(function () {
             // Add user to the connections list.
             var con = connectionsRef.push(true);
 
+            // Get the KeyID of the connection
+            userId = con.getKey();
+
+            // Log the KeyID of the connection
+            console.log('Connected as: ' + userId);
+
+            // Add the mode value to the conenction
+            connectionsRef.child(userId).set({
+                "mode": "viewer"
+            });
+
             // Remove user from the connection list when they disconnect.
             con.onDisconnect().remove();
         }
+
     });
 
+    // Send the choices of the players
+    function whoWin(p1, p2) {
+
+        // console.log("Calculating winers");
+        // console.log("Choice 1: " + p1);
+        // console.log("Choice 2: " + p2);
+
+        // Probing the choices
+        if ((p1 === "rock") || (p1 === "paper") || (p1 === "scissors")) {
+
+            if ((p1 === "rock" && p2 === "scissors") ||
+                (p1 === "scissors" && p2 === "paper") ||
+                (p1 === "paper" && p2 === "rock")) {
+                //Player 1 WINS;
+                // console.log("WINNER: P1");
+                return "p1name";
+
+            } else if (p1 === p2) {
+                // It's a tie;
+                // console.log("its a tie");
+                return "tie";
+
+            } else {
+                //Player 2 WINS;
+                // console.log("WINNER: P2");
+                return "p2name";
+
+            }
+        }
+    }
+
+    // When the two players make their choice their choices are probed
+    playerInfo.on("value", function (snap) {
+
+        // Only if both choices are TRUE (not empty)
+        if (snap.val().p1choice && snap.val().p2choice) {
+            whoWin(snap.val().p1choice, snap.val().p2choice);
+        }
+    });
+
+    // When someone connects or disconnects this is triggered
     connectionsRef.on('value', function (snap) {
 
+        // Viewers ara as many connections we have
         viewers = parseInt(snap.numChildren());
-
-        // Someone has connected!
-        console.log("Viewers: " + viewers);
 
         // Update the number of viewers in the database
         gameStats.update({
             "viewers": viewers
         });
 
-        $("#connected-viewers").text(viewers);
+        // Look for VIEWERS with 'player' mode
+        checkFor('player');
+
+        // Re-draw screen
+        updateScreen();
     })
 
-    players.on('value', function (snap) {
+    // Updating the number of players from the database
+    gameStats.on('value', function (snap) {
 
-        if (snap.exists()) {
-            players = snap.numChildren();
-            console.log('Ther is at least one player');
-            playButton.hide();
+        // Update the number of players in the browser
+        players = snap.val().players;
 
-        } else {
-            players = 0;
-            console.log('There are NO players');
-            // console.log(gameStats.doc());
-            playButton.show();
-
-        }
-        // Player 1 has been updated!
-
-        $("#connected-players").text(players);
-
+        // Re-draw screen
+        updateScreen();
     })
 
-    player1.on('value', function (snap) {
+    // ********************************
+    // **      BUTTON logic
+    // ********************************
 
-        if (snap.exists()) {
-            console.log('P1 Name: ' + snap.val().name);
-            console.log('P1 Choice: ' + snap.val().choice);
+    // The player makes a choice
+    $(".choice").on("click", function () {
+
+        // No backsies! Only can choice once 
+        if (choiceDone) {
+            return;
         }
-        // Player 1 has been updated!
 
+        // Choice made... can't change it
+        choiceDone = true;
+
+        // Save the player's choice
+        player.choice = this.id;
+
+        // Fade option buttons
+        $(".choice").fadeTo(0, 0.5, function () {
+            document.getElementById(player.choice).style.opacity = "1";
+        });
+
+        // setTimeout(() => {
+        // }, 60);
+
+
+        // Log player's choice
+        //console.log(player.choice);
+
+        // Update the player choice to the connection tree
+        connectionsRef.child(userId).update({
+            "choice": player.choice
+        });
+
+        // Re-draw screen
+        updateScreen();
     })
 
-    player2.on('value', function (snap) {
+    // The user clicks to VIEW... not playing!
+    $("#buttonView").on("click", function (e) {
+        e.preventDefault();
 
-        if (snap.exists()) {
-            console.log('P2 Name: ' + snap.val().name);
-            console.log('P2 Choice: ' + snap.val().choice);
-        }
-        // Player 2 has been updated!
+        playerMode = false;
+        viewerMode = true;
 
+        // Re-draw screen
+        updateScreen();
     })
 
-    playButton.on("click", function (event) {
-        event.preventDefault();
+    // The user clicks to PLAY... turning it into PLAYER
+    $("#buttonPlay").on("click", function (e) {
+        e.preventDefault();
 
-        pName = $("@player-name").val().trim();
+        playerMode = true;
+        viewerMode = false;
 
-        console.log('lets play!');
-
-        player = true;
-        switch (players) {
-            case 0:
-                console.log('You are player 1');
-
-                // set the player 1 info
-                player1.update({
-                    "name": pName
-                });
-
-                break;
-
-            case 1:
-                console.log('You are player 2');
-
-                // set the player 1 info
-                player2.update({
-                    "name": pName
-                });
-
-                break;
-
-            default:
-                break;
+        // Escaping if no name was given
+        if (!$("#player-name").val().trim()) {
+            alert('Please enter a valid name and clik PLAY');
+            return;
         }
+
+        // Set the player name locally
+        player.name = $("#player-name").val().trim();
+
+        // Clear the input box
+        $("#player-name").val("");
+
+        //Log the player name
+        //console.log('Lets play ' + player.name);
+
+        // Get into play mode
+        playerMode = true;
+
+        // Clears the choice flag
+        choiceDone = false;
+
+        // Changes the VIEWER into PLAYER + adding set name
+        connectionsRef.child(userId).update({
+            "mode": "player",
+            "name": player.name
+        });
+
+        games++;
+    });
+
+    // The PLAYER wants to play a subsecuent game
+    $("#buttonAgain").on("click", function (e) {
+        e.preventDefault();
+
+        console.log("REPLAY!!")
+
+        // Clears the choice flag
+        choiceDone = false;
+
+        // Show option buttons
+        $(".choice").fadeTo(0, 1);
+        $("#playerSub").fadeTo(0, 1);
+
+        $("#selection").empty();
+
+        player.choice = "";
+        oponent.choice = "";
+
+        connectionsRef.child(userId).update({
+            "choice": ""
+        });
+
+        // Re-draw screen
+        updateScreen();
+        
+        games++;
+    });
+
+    // Player decides to stop playing
+    $("#buttonQuit").on("click", function () {
 
         // Increase the number of players
-        players++;
+        players--;
+
+        // Out of game mode
+        playerMode = false;
+        viewerMode = true;
 
         // Update the number of players in the database
         gameStats.update({
             "players": players
         });
 
+        // Changes the PLAYER back to VIEWER
+        connectionsRef.child(userId).set({
+            "mode": "viewer"
+        });
+
+    })
+
+    // Toggles instructions visibility
+    $("#showInstructions").on("click", function () {
+        $("#instructions").fadeToggle();
+    })
 
 
-    });
 
 });

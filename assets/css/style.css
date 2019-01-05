@@ -8,45 +8,45 @@ body {
     text-shadow: 1px 1px 3px #000000;
     text-align: center;
     font-family: 'Stylish', sans-serif;
-}
-
-.container{
-    margin-top: 60px;
-}
-
-#logoSection{
-    margin-bottom: -65px;
-}
-
-#welcomeSection, 
-#userSection, 
-#statsSection, 
-#viewerSection, 
-#playerSection{
     font-size: 1.5rem;
 }
 
-#selection{
-    opacity: 0;
+#logoSection {
+    margin-top: 50px;
+    margin-bottom: -35px;
 }
 
-.card{
+li{
+    margin-bottom: 20px;
+}
+
+.card {
+    /* border: none; */
+    background-color: #0000002f;
+}
+
+.card-header {
+    background-color: rgba(0,0,0,0.5);
+}
+
+#welcomeSection,
+#userSection,
+#statsSection,
+#viewerSection,
+#playerSection {
     border: none;
     background-color: #24fd5300;
 }
 
-.noFont{
-    font-family: "Segoe UI","Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
-}
-
-#quit{
-    margin-top: 40px;
-}
-
-@media screen and (max-width: 768px) {
-
-    
 
 
-    
-}
+
+
+
+
+
+
+
+
+
+@media screen and (max-width: 768px) {}
