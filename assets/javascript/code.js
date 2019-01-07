@@ -50,7 +50,7 @@ $(document).ready(function () {
 
     var gameStats = database.ref("/rpm_multiuser/gameStats");
     var playerInfo = database.ref("/rpm_multiuser/playerInfo");
-    var connectionsRef = database.ref("/rpm_multiuser/connections");
+    var connectionsRef = database.ref("/rpm_multiuser/");
     var connectedRef = database.ref(".info/connected");
 
     // ----------------------------------------------
@@ -113,7 +113,8 @@ $(document).ready(function () {
 
         let modeRef = firebase.database().ref('/rpm_multiuser');
 
-        modeRef.child('connections').orderByChild('mode').equalTo(mode).on("value", function (snapshot) {
+        //modeRef.child('connections').orderByChild('mode').equalTo(mode).on("value", function (snapshot) {
+        modeRef.orderByChild('mode').equalTo(mode).on("value", function (snapshot) {
 
             // Get the id, name and choice of players, then save localy
             snapshot.forEach(function (data) {
