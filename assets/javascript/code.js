@@ -14,7 +14,7 @@ var wins = 2;
 var loses = 3;
 
 //      BOOLEAN
-var oponent = false;
+var choiceMade = false;
 
 //      OBJECTS
 
@@ -27,7 +27,6 @@ function playerInfo(playerName, playerChoice) {
 var player1 = new playerInfo('', ''); // Contains CURRENT player info
 var player2 = new playerInfo('', ''); // Contains CURRENT player info
 var player = new playerInfo('', ''); // Contains CURRENT player info
-var oponent = new playerInfo('', ''); // Contains OPONENT payer info
 
 // ------------------------------------------------------------
 
@@ -90,6 +89,16 @@ $(document).ready(function () {
         // save them locally on its respective objects.
 
         // Look for VIEWERS with 'player' mode
+        player1 = {
+            name: '',
+            choice: ''
+        };
+
+        player2 = {
+            name: '',
+            choice: ''
+        };
+
         checkFor('player1');
         checkFor('player2');
 
@@ -106,10 +115,41 @@ $(document).ready(function () {
 
     // ----------------------------------------------
 
+    // Send the choices of the players
+    function whoWin(p1, p2) {
+
+        // console.log("Calculating winers");
+        // console.log("Choice 1: " + p1);
+        // console.log("Choice 2: " + p2);
+
+        // Probing the choices
+        if ((p1 === "rock") || (p1 === "paper") || (p1 === "scissors")) {
+
+            if ((p1 === "rock" && p2 === "scissors") ||
+                (p1 === "scissors" && p2 === "paper") ||
+                (p1 === "paper" && p2 === "rock")) {
+                //Player 1 WINS;
+                // console.log("WINNER: P1");
+                return "player1";
+
+            } else if (p1 === p2) {
+                // It's a tie;
+                // console.log("its a tie");
+                return "tie";
+
+            } else {
+                //Player 2 WINS;
+                // console.log("WINNER: P2");
+                return "player2";
+
+            }
+        }
+    }
+
     // Look for viewers in 'player' mode
     function checkFor(mode) {
 
-        console.log("looking for " + mode);
+        // console.log("looking for " + mode);
 
         let modeRef = firebase.database().ref('/rpm_multiuser');
 
@@ -129,21 +169,16 @@ $(document).ready(function () {
                 eval(mode).name = data.val().name;
                 eval(mode).choice = data.val().choice;
             });
-
         });
-
     }
-
-
-
 
     // Re-draw screen based on game variables
     function updateScreen() {
 
-
         if (mode === 'player1') {
+            //Player is player 1
 
-            console.log("Player is player 1")
+            // console.log("Player is player 1")
 
             $("#welcomeSection").hide();
             $("#userSection").hide();
@@ -157,8 +192,9 @@ $(document).ready(function () {
             $("#p2v").show();
 
         } else if (mode === 'player2') {
+            //Player is player 2
 
-            console.log("Player is player 2")
+            // console.log("Player is player 2")
 
             $("#welcomeSection").hide();
             $("#userSection").hide();
@@ -172,8 +208,9 @@ $(document).ready(function () {
             $("#p2v").hide();
 
         } else if (mode === 'viewer') {
+            //Player is just watching
 
-            console.log("Just viewing")
+            // console.log("Just watching")
 
             $("#welcomeSection").hide();
             $("#userSection").hide();
@@ -182,21 +219,92 @@ $(document).ready(function () {
 
         }
 
-
-
+        // Display the game stats in the wings
         $(".playerStats").text("GAMES: " + games + " - WINS: " + wins + " - LOSES: " + loses);
 
         if (player1.name) {
+            // If a PLAYER1 exists
+
+            // Hide the button to play as PLAYER 1
+            $(".buttonP1").hide();
+
+            // Display the username in the wing
             $(".player1Name").text("Player 1: " + player1.name);
+
         } else {
+            $(".buttonP1").show();
             $(".player1Name").text("Waiting for player");
         }
 
         if (player2.name) {
+            // If a PLAYER2 exists
+
+            // Hide the button to play as PLAYER 2
+            $(".buttonP2").hide();
+
+            // Display the username in the wing
             $(".player2Name").text("Player 2: " + player2.name);
+
         } else {
+            $(".buttonP2").show();
             $(".player2Name").text("Waiting for player");
         }
+
+        if (player1.choice) {
+            // If player 1 make choice, show to viewers only
+            $("#player1choice").html('<img src="./assets/images/icon_' + player1.choice + '.png" id="' + player1.choice + '" alt="' + player1.choice + '"></img>');
+        } else {
+            //If no choice then clear
+            $("#player1choice").html('');
+            $(".oponentChoice1").html('');
+        }
+
+        if (player2.choice) {
+            // If player 2 make choice, show to viewers only
+            $("#player2choice").html('<img src="./assets/images/icon_' + player2.choice + '.png" id="' + player2.choice + '" alt="' + player2.choice + '"></img>');
+        } else {
+            //If no choice then clear
+            $("#player2choice").html('');
+            $(".oponentChoice2").html('');
+        }
+
+        if (player1.choice && player2.choice) {
+            // If both players have chosen then test who wins?
+
+            // Winner return who wins (player1, player2 or tie)
+            var winner = whoWin(player1.choice, player2.choice);
+
+            // Depending who wins
+            switch (winner) {
+                case 'player1': // If PLAYER1 wins
+                    $(".resultMessageV").text(eval(winner).name + " wins!");
+                    console.log(eval(winner).name + " wins!");
+                    break;
+
+                case 'player2': // If PLAYER2 wins
+                    $(".resultMessageV").text(eval(winner).name + " wins!");
+                    console.log(eval(winner).name + " wins!");
+                    break;
+
+                case 'tie': // If it's a tie
+                    $(".resultMessageV").text("Same choice... its a tie");
+                    console.log("Same choice... its a tie");
+                    break;
+            }
+
+            //show their oponent's choice
+
+            $(".oponentChoice1").html('<img src="./assets/images/icon_' + player1.choice + '.png" id="' + player1.choice + '" alt="' + player1.choice + '"></img>');
+            $(".oponentChoice2").html('<img src="./assets/images/icon_' + player2.choice + '.png" id="' + player2.choice + '" alt="' + player2.choice + '"></img>');
+
+            // TO DO:
+            // Wait TIME seconds and reset game to play again
+            // Show "YOU WIN" or "YOU LOOSE" for the player
+            // Count win / loses
+
+
+        }
+
 
 
     }
@@ -207,7 +315,7 @@ $(document).ready(function () {
     // ********************************
 
     // Select to play as PLAYER 1
-    $("#buttonP1").on("click", function (e) {
+    $(".buttonP1").on("click", function (e) {
         e.preventDefault();
 
         // Escaping if no name was given
@@ -230,7 +338,7 @@ $(document).ready(function () {
     })
 
     // Select to play as PLAYER 2
-    $("#buttonP2").on("click", function (e) {
+    $(".buttonP2").on("click", function (e) {
         e.preventDefault();
 
         // Escaping if no name was given
@@ -253,7 +361,7 @@ $(document).ready(function () {
     })
 
     // Select to become a VIEWER
-    $("#buttonView").on("click", function (e) {
+    $(".buttonView").on("click", function (e) {
         e.preventDefault();
 
         // Escaping if no name was given
@@ -262,7 +370,7 @@ $(document).ready(function () {
             return;
         }
 
-        // Set the local mode to PLAYER 2
+        // Set the local mode to VIEWER
         mode = 'viewer';
 
         // Update the previous values to FireBase
@@ -275,16 +383,53 @@ $(document).ready(function () {
         updateScreen();
     })
 
+    // Player QUITs playing
+    $(".buttonQuit").on("click", function (e) {
+        e.preventDefault();
+
+        // Set the local mode to VIEWER
+        mode = 'viewer';
+
+        // Update the previous values to FireBase
+        connectionsRef.child(userId).update({
+            "mode": mode,
+            "choice": ""
+        });
+
+        // Re-draw screen
+        updateScreen();
+    })
+
 
     // The player makes a choice
     $(".choice").on("click", function () {
 
+        // If a choice has been made, exit and do nothing
+        if (choiceMade) {
+            return;
+        }
+
+        // Save the PLAYER1 or PLAYER2 object into PLAYER ust to make it easier
+        player = eval(mode);
+
+        // The choice comes from the 'id' of the image pressed
+        // NOTE: the 'id' have a '1' or '2'! Need to remove using '.slice(0,-1)' method.
         player.choice = this.id;
 
         // Fade option buttons
         $(".choice").fadeTo(0, 0.5, function () {
             document.getElementById(player.choice).style.opacity = "1";
         });
+
+        //Only one chance to pick!
+        choiceMade = true;
+
+        // Update the previous values to FireBase
+        connectionsRef.child(userId).update({
+            "mode": mode,
+            "choice": player.choice.slice(0, -1)
+        });
+
 
     })
 

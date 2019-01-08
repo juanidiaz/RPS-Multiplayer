@@ -70,7 +70,7 @@
                                 <li>You LOSE if your choice is beat by the oponent's.</li>
                                 <li>You TIE if your choice is the same as the oponent's.</li>
                                 -->
-                                 <li>Once the draw is done you can keep playing or quit and become a viewer... thus
+                                <li>Once the draw is done you can keep playing or quit and become a viewer... thus
                                     leving the player spot empty.</li>
                                 <li class="text-warning">Make sure you don't close or refresh your browser as this will
                                     END YOUR GAME!</li>
@@ -86,11 +86,9 @@
                     <div class="row justify-content-center">
                         <div class="col-8">
                             <div class="mb-3">
-                                <button class="btn btn-lg btn-warning mr-3" type="button" id="buttonP1">Play as
-                                    player 1</button>
-                                <button class="btn btn-lg btn-dark mr-3" type="button" id="buttonView">Just watch the
-                                    game</button>
-                                <button class="btn btn-lg btn-warning" type="button" id="buttonP2">Play as player 2</button>
+                                <button class="btn btn-lg btn-warning mr-3 buttonP1" type="button">Play as player 1</button>
+                                <button class="btn btn-lg btn-dark mr-3 buttonView" type="button">Just watch the game</button>
+                                <button class="btn btn-lg btn-warning buttonP2" type="button">Play as player 2</button>
                             </div>
                             <div class="mb-3">
                                 <input type="text" class="form-control" id="player-name" placeholder="Enter your name">
@@ -118,12 +116,12 @@
                                 <li><img src="./assets/images/icon_rock.png" class="mr-5 choice" id="rock1" alt="Rock"></li>
                                 <li><img src="./assets/images/icon_scissors.png" class="choice" id="scissors1" alt="Scissors"></li>
                             </ul>
-                            <button type="button" class="btn btn-lg btn-warning" id="quit">Quit Playing</button>
+                            <button type="button" class="btn btn-lg btn-warning buttonQuit">Quit Playing</button>
                         </div>
 
                         <div class="card-body" id="p1v">
                             <ul class="list-unstyled mt-3 mb-4">
-                                <li id="oponentChoice"><img src="./assets/images/icon_paper.png" id="paper" alt="Paper"></li>
+                                <li class="oponentChoice1"></li>
                             </ul>
                         </div>
                     </div>
@@ -140,19 +138,23 @@
                                 <li><img src="./assets/images/icon_rock.png" class="mr-5 choice" id="rock2" alt="Rock"></li>
                                 <li><img src="./assets/images/icon_scissors.png" class="choice" id="scissors2" alt="Scissors"></li>
                             </ul>
-                            <button type="button" class="btn btn-lg btn-warning" id="quit">Quit Playing</button>
+                            <button type="button" class="btn btn-lg btn-warning buttonQuit">Quit Playing</button>
                         </div>
 
                         <div class="card-body" id="p2v">
                             <ul class="list-unstyled mt-3 mb-4">
-                                <li id="oponentChoice"><img src="./assets/images/icon_paper.png" id="paper" alt="Paper"></li>
+                                <li class="oponentChoice2"></li>
                             </ul>
                         </div>
                     </div>
-
-
-
                 </div>
+
+                <div class="row justify-content-center">
+                    <div class="col-lg-10" id="welcomeCol">
+                        <h2 class="text-warning display-4 resultMessageP">RESULT FOR PLAYERS</h2>
+                    </div>
+                </div>
+
             </section>
 
 
@@ -164,9 +166,9 @@
                         </div>
                         <div class="card-body">
                             <ul class="list-unstyled mt-3 mb-4">
-                                <li id="oponentChoice"><img src="./assets/images/icon_scissors.png" id="paper" alt="Paper"></li>
+                                <li id="player1choice"></li>
                             </ul>
-                            <button type="button" class="btn btn-lg btn-warning" id="quit">Play as player 1</button>
+                            <button type="button" class="btn btn-lg btn-warning buttonP1">Play as player 1</button>
                         </div>
                     </div>
 
@@ -176,12 +178,19 @@
                         </div>
                         <div class="card-body">
                             <ul class="list-unstyled mt-3 mb-4">
-                                <li id="oponentChoice"><img src="./assets/images/icon_paper.png" id="paper" alt="Paper"></li>
+                                <li id="player2choice"></li>
                             </ul>
-                            <button type="button" class="btn btn-lg btn-warning" id="quit">Play as player 2</button>
+                            <button type="button" class="btn btn-lg btn-warning buttonP2">Play as player 2</button>
                         </div>
                     </div>
                 </div>
+
+                <div class="row justify-content-center">
+                    <div class="col-lg-10" id="welcomeCol">
+                        <h2 class="text-warning display-4 resultMessageV">RESULT FOR VIEWERS</h2>
+                    </div>
+                </div>
+
             </section>
 
 
