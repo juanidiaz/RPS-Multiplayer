@@ -1,3 +1,7 @@
+// TO DO:
+// Update instructions
+// Corfirm all code and comments are ok 
+
 // VARIABLES --------------------------------------------
 
 //      CONSTANTS
@@ -9,9 +13,9 @@ var userId = ''; // User UD when connecting to database
 var mode = '';
 
 //      NUMBER/INTEGER
-var wins = 2;
-var loses = 3;
-
+var wins = 0;
+var loses = 0;
+var test = 0;
 //      BOOLEAN
 var choiceMade = false;
 
@@ -83,11 +87,7 @@ $(document).ready(function () {
     // also when any of the connections change its values
     connectionsRef.on('value', function (snap) {
 
-        // This function will harvest the: KEY, MODE, NAME and CHOICE
-        // of the connections with MODE 'PLAYER 1' and 'PLAYER 2' and
-        // save them locally on its respective objects.
-
-        // Look for VIEWERS with 'player' mode
+        // Clear the local records for 'PLAYER 1' and 'PLAYER 2'
         player1 = {
             name: '',
             choice: ''
@@ -98,6 +98,9 @@ $(document).ready(function () {
             choice: ''
         };
 
+        // These calls will harvest the: KEY, MODE, NAME and CHOICE
+        // of the connections with MODE 'PLAYER 1' and 'PLAYER 2' and
+        // save them locally on its respective objects.
         checkFor('player1');
         checkFor('player2');
 
@@ -117,6 +120,7 @@ $(document).ready(function () {
     // Send the choices of the players
     function whoWin(p1, p2) {
 
+        test++;
         // console.log("Calculating winers");
         // console.log("Choice 1: " + p1);
         // console.log("Choice 2: " + p2);
@@ -143,6 +147,7 @@ $(document).ready(function () {
 
             }
         }
+
     }
 
     // Look for viewers in 'player' mode
@@ -174,9 +179,7 @@ $(document).ready(function () {
     // Re-draw screen based on game variables
     function updateScreen() {
 
-        if (mode === 'player1') {
-            //Player is player 1
-
+        if (mode === 'player1') { //Player is player 1
             // console.log("Player is player 1")
 
             $("#welcomeSection").hide();
@@ -190,9 +193,7 @@ $(document).ready(function () {
             $("#p2p").hide();
             $("#p2v").show();
 
-        } else if (mode === 'player2') {
-            //Player is player 2
-
+        } else if (mode === 'player2') { //Player is player 2
             // console.log("Player is player 2")
 
             $("#welcomeSection").hide();
@@ -206,51 +207,43 @@ $(document).ready(function () {
             $("#p2p").show();
             $("#p2v").hide();
 
-        } else if (mode === 'viewer') {
-            //Player is just watching
-
+        } else if (mode === 'viewer') { //Player is just watching
             // console.log("Just watching")
 
             $("#welcomeSection").hide();
             $("#userSection").hide();
             $("#gameSection").hide();
             $("#viewerSection").show();
-
         }
 
-        // Display the game stats in the wings
-        $(".playerStats").text("WINS: " + wins + " - LOSES: " + loses);
-
-        if (player1.name) {
-            // If a PLAYER1 exists
+        if (player1.name) { // If a PLAYER1 exists
 
             // Hide the button to play as PLAYER 1
             $(".buttonP1").hide();
 
             // Display the username in the wing
-            $(".player1Name").text("Player 1: " + player1.name);
+            $(".player1Name").text("Player: " + player1.name);
 
         } else {
             $(".buttonP1").show();
             $(".player1Name").text("Waiting for player");
         }
 
-        if (player2.name) {
-            // If a PLAYER2 exists
+        if (player2.name) { // If a PLAYER2 exists
 
             // Hide the button to play as PLAYER 2
             $(".buttonP2").hide();
 
             // Display the username in the wing
-            $(".player2Name").text("Player 2: " + player2.name);
+            $(".player2Name").text("Player: " + player2.name);
 
         } else {
             $(".buttonP2").show();
             $(".player2Name").text("Waiting for player");
         }
 
-        if (player1.choice) {
-            // If player 1 make choice, show to viewers only
+        if (player1.choice) { // If player 1 make choice
+            // Show choice to viewers only
             $("#player1choice").html('<img src="./assets/images/icon_' + player1.choice + '.png" id="' + player1.choice + '" alt="' + player1.choice + '"></img>');
         } else {
             //If no choice then clear
@@ -258,8 +251,8 @@ $(document).ready(function () {
             $(".oponentChoice1").html('');
         }
 
-        if (player2.choice) {
-            // If player 2 make choice, show to viewers only
+        if (player2.choice) { // If player 2 make choice
+            // Show to viewers only
             $("#player2choice").html('<img src="./assets/images/icon_' + player2.choice + '.png" id="' + player2.choice + '" alt="' + player2.choice + '"></img>');
         } else {
             //If no choice then clear
@@ -273,6 +266,10 @@ $(document).ready(function () {
             // Winner return who wins (player1, player2 or tie)
             var winner = whoWin(player1.choice, player2.choice);
 
+            //show their oponent's choice
+            $(".oponentChoice1").html('<img src="./assets/images/icon_' + player1.choice + '.png" id="' + player1.choice + '" alt="' + player1.choice + '"></img>');
+            $(".oponentChoice2").html('<img src="./assets/images/icon_' + player2.choice + '.png" id="' + player2.choice + '" alt="' + player2.choice + '"></img>');
+
             // Depending who wins
             switch (winner) {
                 case 'player1': // If PLAYER1 wins
@@ -280,8 +277,10 @@ $(document).ready(function () {
                     // Message for PLAYERS
                     if (mode == winner) {
                         $(".resultMessageP").text("You won!");
+                        wins++;
                     } else {
                         $(".resultMessageP").text("You lost!");
+                        loses++;
                     }
 
                     // Message for VIEWERS
@@ -294,8 +293,10 @@ $(document).ready(function () {
                     // Message for PLAYERS
                     if (mode == winner) {
                         $(".resultMessageP").text("You won!");
+                        wins++;
                     } else {
                         $(".resultMessageP").text("You lost!");
+                        loses++;
                     }
 
                     $(".resultMessageV").text(eval(winner).name + " wins!");
@@ -312,23 +313,57 @@ $(document).ready(function () {
                     break;
             }
 
-            //show their oponent's choice
+            // Wait some time to show the winner and clear all games
+            setTimeout(function () {
+                prepareForNewGame();
+                console.log("NEW GAME");
 
-            $(".oponentChoice1").html('<img src="./assets/images/icon_' + player1.choice + '.png" id="' + player1.choice + '" alt="' + player1.choice + '"></img>');
-            $(".oponentChoice2").html('<img src="./assets/images/icon_' + player2.choice + '.png" id="' + player2.choice + '" alt="' + player2.choice + '"></img>');
-
-            // TO DO:
-            // Wait TIME seconds and reset game to play again
-            // Count win / loses
-            // When player quits or game restart the LOCAL choices need to be cleared
-
-
+            }, 5000); // Wait this many miliseconds after the second card is picked
         }
 
-
+        // Update stats
+        $(".playerStats").text("WINS: " + wins + " - LOSES: " + loses);
 
     }
 
+    // Return everything for a new game
+    function prepareForNewGame() {
+
+        // Clear the local records done by player
+        if (mode !== 'viewer') {
+            var object = eval(mode);
+            object = {
+                name: '',
+                choice: ''
+            };
+
+            player = {
+                name: '',
+                choice: ''
+            }
+
+            // Remove the choice value in FireBase
+            connectionsRef.child(userId).update({
+                "choice": player.choice
+            });
+
+            // Reset result message
+            $(".resultMessageP").text("Make a choice");
+
+            // Make icons 100% visible
+            $(".choice").css("opacity", "1");
+
+            //Only one chance to pick!
+            choiceMade = false;
+        } else {
+            // Reset result message
+            $(".resultMessageV").text("");
+
+        }
+
+        // Re-draw screen
+        updateScreen();
+    }
 
     // ********************************
     // **        BUTTON logic        **
@@ -337,6 +372,10 @@ $(document).ready(function () {
     // Select to play as PLAYER 1
     $(".buttonP1").on("click", function (e) {
         e.preventDefault();
+
+        // Reset game stats
+        wins = 0;
+        loses = 0;
 
         // Escaping if no name was given
         if (!$("#player-name").val().trim()) {
@@ -353,6 +392,9 @@ $(document).ready(function () {
             "name": $("#player-name").val().trim()
         });
 
+        // Save the PLAYER1 or PLAYER2 object into PLAYER ust to make it easier
+        player = eval(mode);
+
         // Re-draw screen
         updateScreen();
     })
@@ -360,6 +402,10 @@ $(document).ready(function () {
     // Select to play as PLAYER 2
     $(".buttonP2").on("click", function (e) {
         e.preventDefault();
+
+        // Reset game stats
+        wins = 0;
+        loses = 0;
 
         // Escaping if no name was given
         if (!$("#player-name").val().trim()) {
@@ -376,8 +422,50 @@ $(document).ready(function () {
             "name": $("#player-name").val().trim()
         });
 
+        // Save the PLAYER1 or PLAYER2 object into PLAYER ust to make it easier
+        player = eval(mode);
+
         // Re-draw screen
         updateScreen();
+    })
+
+    // Player QUITs playing
+    $(".buttonQuit").on("click", function (e) {
+        e.preventDefault();
+
+        // Clear the local records done by player
+        var object = eval(mode);
+        object = {
+            name: '',
+            choice: ''
+        };
+
+        player = {
+            name: '',
+            choice: ''
+        };
+
+        // Reset result message
+        $(".resultMessageP").text("Make a choice");
+
+        // Make icons 100% visible
+        $(".choice").css("opacity", "1");
+
+        //Only one chance to pick!
+        choiceMade = false;
+
+        // Set the local mode to VIEWER
+        mode = 'viewer';
+
+        // Update the previous values to FireBase
+        connectionsRef.child(userId).update({
+            "mode": mode,
+            "choice": ""
+        });
+
+        // Re-draw screen
+        updateScreen();
+
     })
 
     // Select to become a VIEWER
@@ -403,34 +491,14 @@ $(document).ready(function () {
         updateScreen();
     })
 
-    // Player QUITs playing
-    $(".buttonQuit").on("click", function (e) {
-        e.preventDefault();
-
-        // Set the local mode to VIEWER
-        mode = 'viewer';
-
-        // Update the previous values to FireBase
-        connectionsRef.child(userId).update({
-            "mode": mode,
-            "choice": ""
-        });
-
-        // Re-draw screen
-        updateScreen();
-    })
-
-
     // The player makes a choice
-    $(".choice").on("click", function () {
+    $(".choice").on("click", function (e) {
+        e.preventDefault();
 
         // If a choice has been made, exit and do nothing
         if (choiceMade) {
             return;
         }
-
-        // Save the PLAYER1 or PLAYER2 object into PLAYER ust to make it easier
-        player = eval(mode);
 
         // The choice comes from the 'id' of the image pressed
         // NOTE: the 'id' have a '1' or '2'! Need to remove using '.slice(0,-1)' method.
@@ -453,6 +521,7 @@ $(document).ready(function () {
 
     })
 
+    // Re-draw screen
     updateScreen();
 
 });
