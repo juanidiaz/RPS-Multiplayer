@@ -9,7 +9,6 @@ var userId = ''; // User UD when connecting to database
 var mode = '';
 
 //      NUMBER/INTEGER
-var games = 1;
 var wins = 2;
 var loses = 3;
 
@@ -220,7 +219,7 @@ $(document).ready(function () {
         }
 
         // Display the game stats in the wings
-        $(".playerStats").text("GAMES: " + games + " - WINS: " + wins + " - LOSES: " + loses);
+        $(".playerStats").text("WINS: " + wins + " - LOSES: " + loses);
 
         if (player1.name) {
             // If a PLAYER1 exists
@@ -277,16 +276,37 @@ $(document).ready(function () {
             // Depending who wins
             switch (winner) {
                 case 'player1': // If PLAYER1 wins
+
+                    // Message for PLAYERS
+                    if (mode == winner) {
+                        $(".resultMessageP").text("You won!");
+                    } else {
+                        $(".resultMessageP").text("You lost!");
+                    }
+
+                    // Message for VIEWERS
                     $(".resultMessageV").text(eval(winner).name + " wins!");
                     console.log(eval(winner).name + " wins!");
                     break;
 
                 case 'player2': // If PLAYER2 wins
+
+                    // Message for PLAYERS
+                    if (mode == winner) {
+                        $(".resultMessageP").text("You won!");
+                    } else {
+                        $(".resultMessageP").text("You lost!");
+                    }
+
                     $(".resultMessageV").text(eval(winner).name + " wins!");
                     console.log(eval(winner).name + " wins!");
                     break;
 
                 case 'tie': // If it's a tie
+                    // Message for PLAYERS
+                    $(".resultMessageP").text("Same choice... its a tie");
+
+                    // Message for PLAYERS
                     $(".resultMessageV").text("Same choice... its a tie");
                     console.log("Same choice... its a tie");
                     break;
@@ -299,8 +319,8 @@ $(document).ready(function () {
 
             // TO DO:
             // Wait TIME seconds and reset game to play again
-            // Show "YOU WIN" or "YOU LOOSE" for the player
             // Count win / loses
+            // When player quits or game restart the LOCAL choices need to be cleared
 
 
         }

@@ -16,7 +16,7 @@ body {
     margin-bottom: -35px;
 }
 
-li{
+li {
     margin-bottom: 20px;
 }
 
@@ -26,7 +26,7 @@ li{
 }
 
 .card-header {
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(0, 0, 0, 0.5);
 }
 
 #welcomeSection,
@@ -38,7 +38,11 @@ li{
     background-color: #24fd5300;
 }
 
+.oponentChoice1,
+.oponentChoice2 {
+    margin-top: 190px;
 
+}
 
 
 
