@@ -1,30 +1,35 @@
 # RPS-Multiplayer
 > **Cretaed by:**     Juan I Diaz (jdi@idiaz.ca)
 
-> **Date:**           December 2018
+> **Date:**           January 2019
 
 ## DESCRIPTION
-This project is an online multiplayer game version of the known rock-paper-scissors game.
-
+On-line version of the popular rock-paper-scissors game. In this version you will be able to just "watch" other people play or, if a spot is available, you can play the game against someone else.
 
 ## INSTRUCTIONS
-1. Create a game that suits this user story:
-   * Only two users can play at the same time.
-
-2. Both players pick either `rock`, `paper` or `scissors`. After the players make their selection, the game will tell them whether a tie occurred or if one player defeated the other.
-   * The game will track each player's wins and losses.
-   * Throw some chat functionality in there! No online multiplayer game is complete without having to endure endless taunts and insults from your jerk opponent.
-
+1. First enter your name in the field below. You wont be able to continue without it.
+2. Select to play as `PLAYER 1` or `PLAYER 2`. If these buttons do not appear is becasue someone else is already playing.
+3. If you want to WATCH the game then click that button. If a player spot becomes available once you are watching you will se the PLAYER button.
+4. Once playing, select `ROCK`, `PAPER` or `SCISSORS` by clicking on the icon of your coosing.
+5. You will only see your oponent's choice when both of you have pick.
+6. You could either `WIN`, `TIE` or `LOOSE` your match. Once the result is shown, the game will reset and continue for a new match.
+7. If you want to leave the game and ve a viewer click `QUIT PLAYING`.
+8. **Make sure you don't close or refresh your browser as this will END YOUR GAME!**
 
 ## SCREENSHOTS
-![Welcome](./assets/images/welcome.png)
+![Welcome](./assets/images/rps_welcome.png)
 
-![Stats](./assets/images/stats.png)
+![player1 screen](./assets/images/rps_player1.png)
+
+![Welcome](./assets/images/rps_match.png)
+
+![Welcome](./assets/images/rps_viewer.png)
 
 ## BUILDING TOOLS
 - HTML, CSS
 - Javascript and jQuery
-- Bootstrap v4
+- Bootstrap
+- Google Firebase (Realtime)
 
 
 ## QUESTIONS OR COMMENTS

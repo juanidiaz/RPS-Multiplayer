@@ -18,6 +18,8 @@ body {
 
 li {
     margin-bottom: 20px;
+    font-size: 1.3rem;
+    line-height: 15px;
 }
 
 .card {
@@ -43,14 +45,5 @@ li {
     margin-top: 190px;
 
 }
-
-
-
-
-
-
-
-
-
 
 @media screen and (max-width: 768px) {}

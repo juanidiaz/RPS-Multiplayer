@@ -1,7 +1,3 @@
-// TO DO:
-// Update instructions
-// Corfirm all code and comments are ok 
-
 // VARIABLES --------------------------------------------
 
 //      CONSTANTS
@@ -10,31 +6,32 @@
 
 //      STRINGS/CHAR
 var userId = ''; // User UD when connecting to database
-var mode = '';
+var mode = '';   // Keeps the mode the user is on ('player1', 'player2' or 'viewer')
 
 //      NUMBER/INTEGER
-var wins = 0;
-var loses = 0;
-var test = 0;
+var wins = 0;   // Keeps track of won matches
+var loses = 0;  // Keeps track of lost matches
+
 //      BOOLEAN
-var choiceMade = false;
+var choiceMade = false;  // Keeps track if choise has been done... no backsies!
 
 //      OBJECTS
 
 // Creating a "player info" object using constructor notation
 function playerInfo(playerName, playerChoice) {
-    this.name = playerName; // Player's name
+    this.name = playerName;     // Player's name
     this.choice = playerChoice; // Player's choice
 }
 
-var player1 = new playerInfo('', ''); // Contains CURRENT player info
-var player2 = new playerInfo('', ''); // Contains CURRENT player info
-var player = new playerInfo('', ''); // Contains CURRENT player info
+var player1 = new playerInfo('', ''); // Contains PLAYER1 info
+var player2 = new playerInfo('', ''); // Contains PLAYER2 info
+var player = new playerInfo('', '');  // Contains CURRENT player info
 
 // ------------------------------------------------------------
 
 $(document).ready(function () {
 
+    // Standard configuration for FireBase database
     var config = {
         apiKey: "AIzaSyAR1BzexHwtNHQ1VZOFjqsTVipSyWvfBnc",
         authDomain: "codingbootcamp-dc35e.firebaseapp.com",
@@ -49,9 +46,6 @@ $(document).ready(function () {
 
     // Create references to the database
     var database = firebase.database();
-
-    var gameStats = database.ref("/rpm_multiuser/gameStats");
-    var playerInfo = database.ref("/rpm_multiuser/playerInfo");
     var connectionsRef = database.ref("/rpm_multiuser/");
     var connectedRef = database.ref(".info/connected");
 
@@ -70,7 +64,7 @@ $(document).ready(function () {
             userId = con.getKey();
 
             // Log the KeyID of the connection
-            console.log('Connected as: ' + userId);
+            // console.log('Connected as: ' + userId);
 
             // Add the mode value to the conenction
             connectionsRef.child(userId).set({
@@ -87,12 +81,12 @@ $(document).ready(function () {
     // also when any of the connections change its values
     connectionsRef.on('value', function (snap) {
 
-        // Clear the local records for 'PLAYER 1' and 'PLAYER 2'
+        // Clear the local records for 'PLAYER 1' 
         player1 = {
             name: '',
             choice: ''
         };
-
+        // and 'PLAYER 2'
         player2 = {
             name: '',
             choice: ''
@@ -110,6 +104,7 @@ $(document).ready(function () {
 
     // ----------------------------------------------
 
+    // Showing the sections for the first time the page is loaded
     $("#welcomeSection").show();
     $("#userSection").show();
     $("#gameSection").hide();
@@ -120,7 +115,6 @@ $(document).ready(function () {
     // Send the choices of the players
     function whoWin(p1, p2) {
 
-        test++;
         // console.log("Calculating winers");
         // console.log("Choice 1: " + p1);
         // console.log("Choice 2: " + p2);
@@ -144,10 +138,8 @@ $(document).ready(function () {
                 //Player 2 WINS;
                 // console.log("WINNER: P2");
                 return "player2";
-
             }
         }
-
     }
 
     // Look for viewers in 'player' mode
@@ -155,6 +147,7 @@ $(document).ready(function () {
 
         // console.log("looking for " + mode);
 
+        // Refernece to FireBase node
         let modeRef = firebase.database().ref('/rpm_multiuser');
 
         //modeRef.child('connections').orderByChild('mode').equalTo(mode).on("value", function (snapshot) {
@@ -170,8 +163,12 @@ $(document).ready(function () {
                 // console.log("CHOICE: " + data.val().choice);
                 // console.log("*******************");
 
-                eval(mode).name = data.val().name;
-                eval(mode).choice = data.val().choice;
+                // Getting the values from the database into the local 'player1' or 'player2' objects
+                // when mode = 'player1' these lines would do:
+                //     player1.name   = data.val().name;
+                //     player1.choice = data.val().choice;
+                eval(mode).name = data.val().name;       // Gets the player's name from the database
+                eval(mode).choice = data.val().choice;   // Gets the player's choice from the databsae
             });
         });
     }
@@ -182,6 +179,7 @@ $(document).ready(function () {
         if (mode === 'player1') { //Player is player 1
             // console.log("Player is player 1")
 
+            // Hide/show sections depending on game mode
             $("#welcomeSection").hide();
             $("#userSection").hide();
             $("#gameSection").show();
@@ -196,6 +194,7 @@ $(document).ready(function () {
         } else if (mode === 'player2') { //Player is player 2
             // console.log("Player is player 2")
 
+            // Hide/show sections depending on game mode
             $("#welcomeSection").hide();
             $("#userSection").hide();
             $("#gameSection").show();
@@ -210,6 +209,7 @@ $(document).ready(function () {
         } else if (mode === 'viewer') { //Player is just watching
             // console.log("Just watching")
 
+            // Hide/show sections depending on game mode
             $("#welcomeSection").hide();
             $("#userSection").hide();
             $("#gameSection").hide();
@@ -285,7 +285,7 @@ $(document).ready(function () {
 
                     // Message for VIEWERS
                     $(".resultMessageV").text(eval(winner).name + " wins!");
-                    console.log(eval(winner).name + " wins!");
+                    // console.log(eval(winner).name + " wins!");
                     break;
 
                 case 'player2': // If PLAYER2 wins
@@ -300,7 +300,7 @@ $(document).ready(function () {
                     }
 
                     $(".resultMessageV").text(eval(winner).name + " wins!");
-                    console.log(eval(winner).name + " wins!");
+                    // console.log(eval(winner).name + " wins!");
                     break;
 
                 case 'tie': // If it's a tie
@@ -309,16 +309,16 @@ $(document).ready(function () {
 
                     // Message for PLAYERS
                     $(".resultMessageV").text("Same choice... its a tie");
-                    console.log("Same choice... its a tie");
+                    // console.log("Same choice... its a tie");
                     break;
             }
 
             // Wait some time to show the winner and clear all games
             setTimeout(function () {
                 prepareForNewGame();
-                console.log("NEW GAME");
+                // console.log("NEW GAME");
 
-            }, 5000); // Wait this many miliseconds after the second card is picked
+            }, 5000); // Wait this many miliseconds after staring a new match
         }
 
         // Update stats
