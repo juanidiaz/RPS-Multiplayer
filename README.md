@@ -1,4 +1,4 @@
-# RPS-Multiplayer
+# Rock Paper Scissors - Multiplayer
 > **Cretaed by:**     Juan I Diaz (jdi@idiaz.ca)
 
 > **Date:**           January 2019
@@ -34,5 +34,5 @@ On-line version of the popular rock-paper-scissors game. In this version you wil
 
 ## QUESTIONS OR COMMENTS
 - Logo taken from [http://www.redbits.com/iphone/rps/](http://www.redbits.com/iphone/rps/).
-- Feel free to contact the developer @ <jdi@idiaz.ca>!
+- Feel free to contact the developer @ <jdi@idiaz.ca> or www.idiaz.ca !
 - See the project [live](https://juanidiaz.github.io/RPS-Multiplayer/).
